@@ -5,6 +5,7 @@ from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
 import modules.shared as shared
 from modules.logging_colors import logger
 from modules.models import get_max_memory_dict
+from auto_gptq import exllama_set_max_input_length
 
 
 def load_quantized(model_name):
@@ -55,7 +56,8 @@ def load_quantized(model_name):
 
     logger.info(f"The AutoGPTQ params are: {params}")
     model = AutoGPTQForCausalLM.from_quantized(path_to_model, **params)
-
+    model = exllama_set_max_input_length(model, 4096)
+    
     # These lines fix the multimodal extension when used with AutoGPTQ
     if hasattr(model, 'model'):
         if not hasattr(model, 'dtype'):
